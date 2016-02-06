@@ -45,8 +45,22 @@ namespace libevent
             if (this.BuildEnvironment.Platform.Includes(EPlatform.Windows))
             {
                 source.AddFiles("$(packagedir)/win32select.c");
-                this.CompileAgainst<WindowsSDK.WindowsSDK>(source);
+                if (this.Librarian is VisualCCommon.Librarian)
+                {
+                    this.CompileAgainst<WindowsSDK.WindowsSDK>(source);
+                }
+                else
+                {
+                    source.PrivatePatch(settings =>
+                        {
+                            var compiler = settings as C.ICommonCompilerSettings;
+                            compiler.PreprocessorDefines.Add("EVENT__HAVE_STDINT_H"); // need to include stdint.h for Mingw
+                        });
+                }
             }
+
+            var openSSLCopyStandardHeaders = Graph.Instance.FindReferencedModule<openssl.CopyStandardHeaders>();
+            source.DependsOn(openSSLCopyStandardHeaders);
 
             this.CompileAgainst<openssl.OpenSSL>(source);
         }

@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageDefinition xsi:schemaLocation="http://www.buildamation.com ./Schema/BamPackageDefinitionV1.xsd" name="libevent" version="2.0.22" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.buildamation.com">
   <Description>libevent 2.0.22 build scripts</Description>
+  <PackageRepositories>
+    <Repo dir="../.." />
+  </PackageRepositories>
+  <Dependents>
+    <Package name="C" />
+    <Package name="Mingw" version="4.8.1" />
+    <Package name="NativeBuilder" />
+    <Package name="openssl" version="1.0.2" />
+    <Package name="VisualC" version="12.0" />
+    <Package name="VSSolutionBuilder" />
+  </Dependents>
   <BamAssemblies>
     <BamAssembly name="Bam.Core" major="1" minor="0" patch="1" />
   </BamAssemblies>
