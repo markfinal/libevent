@@ -40,6 +40,12 @@ namespace libevent
                         compiler.IncludePaths.AddUnique(this.CreateTokenizedString("$(packagedir)/compat"));
                         compiler.IncludePaths.AddUnique(this.CreateTokenizedString("$(packagedir)/WIN32-Code/nmake"));
                     }
+
+                    var vcCompiler = settings as VisualCCommon.ICommonCompilerSettings;
+                    if (null != vcCompiler)
+                    {
+                        vcCompiler.WarningLevel = VisualCCommon.EWarningLevel.Level2; // will not compile at a higher warning level
+                    }
                 });
 
             if (this.BuildEnvironment.Platform.Includes(EPlatform.Windows))
