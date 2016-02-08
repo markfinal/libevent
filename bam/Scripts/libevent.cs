@@ -11,11 +11,6 @@ namespace libevent
         {
             base.Init(parent);
 
-            // TODO: this does not forward on this dependency, which is required to modules to use OpenSSL
-            // as it is a dependency for the public patch below
-            var generateConfig = Graph.Instance.FindReferencedModule<GenerateConfigHeader>();
-            this.DependsOn(generateConfig);
-
             this.PublicPatch((settings, appliedTo) =>
                 {
                     var compiler = settings as C.ICommonCompilerSettings;
@@ -64,6 +59,11 @@ namespace libevent
                         });
                 }
             }
+
+            var generateConfig = Graph.Instance.FindReferencedModule<GenerateConfigHeader>();
+            source.DependsOn(generateConfig);
+
+            this.Requires(generateConfig); // this is for IDE projects, which require a different level of granularity
 
             var openSSLCopyStandardHeaders = Graph.Instance.FindReferencedModule<openssl.CopyStandardHeaders>();
             var openSSLConfigHeader = Graph.Instance.FindReferencedModule<openssl.GenerateConfHeader>();
