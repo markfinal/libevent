@@ -66,7 +66,8 @@ namespace libevent
             }
 
             var openSSLCopyStandardHeaders = Graph.Instance.FindReferencedModule<openssl.CopyStandardHeaders>();
-            source.DependsOn(openSSLCopyStandardHeaders);
+            var openSSLConfigHeader = Graph.Instance.FindReferencedModule<openssl.GenerateConfHeader>();
+            source.DependsOn(openSSLCopyStandardHeaders, openSSLConfigHeader);
 
             this.CompileAgainst<openssl.OpenSSL>(source);
         }

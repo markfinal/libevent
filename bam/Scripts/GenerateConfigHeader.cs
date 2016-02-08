@@ -3,70 +3,32 @@ namespace libevent
 {
     [ModuleGroup("Thirdparty/libevent")]
     sealed class GenerateConfigHeader :
-        C.CModule
+        C.ProceduralHeaderFile
     {
-        public static Bam.Core.PathKey Key = Bam.Core.PathKey.Generate("libevent conf header");
-
-        protected override void
-        Init(
-            Module parent)
+        protected override TokenizedString OutputPath
         {
-            base.Init(parent);
-            this.GeneratedPaths.Add(Key, this.CreateTokenizedString("$(packagebuilddir)/event2/event-config.h"));
-        }
-
-        public override void
-        Evaluate()
-        {
-            this.ReasonToExecute = null;
-            var outputPath = this.GeneratedPaths[Key].Parse();
-            if (!System.IO.File.Exists(outputPath))
+            get
             {
-                this.ReasonToExecute = Bam.Core.ExecuteReasoning.FileDoesNotExist(this.GeneratedPaths[Key]);
-                return;
+                return this.CreateTokenizedString("$(packagebuilddir)/event2/event-config.h");
             }
         }
 
-        protected override void
-        ExecuteInternal(
-            ExecutionContext context)
+        protected override string Contents
         {
-            var destPath = this.GeneratedPaths[Key].Parse();
-            var destDir = System.IO.Path.GetDirectoryName(destPath);
-            if (!System.IO.Directory.Exists(destDir))
+            get
             {
-                System.IO.Directory.CreateDirectory(destDir);
-            }
-            if (this.BuildEnvironment.Platform.Includes(EPlatform.Windows))
-            {
-                using (System.IO.TextWriter writeFile = new System.IO.StreamWriter(destPath))
+                if (this.BuildEnvironment.Platform.Includes(EPlatform.Windows))
                 {
                     using (System.IO.TextReader readFile = new System.IO.StreamReader(this.CreateTokenizedString("$(packagedir)/WIN32-Code/nmake/event2/event-config.h").Parse()))
                     {
-                        writeFile.Write(readFile.ReadToEnd());
+                        return readFile.ReadToEnd();
                     }
                 }
-            }
-            else
-            {
-                using (System.IO.TextWriter writeFile = new System.IO.StreamWriter(destPath))
+                else
                 {
-                    writeFile.WriteLine("#define _EVENT_SIZEOF_SIZE_T 8"); // assume 64-bit
-                    if (this.BuildEnvironment.Platform.Includes(EPlatform.Windows))
-                    {
-                        writeFile.WriteLine("#include \"BaseTsd.h\"");
-                        writeFile.WriteLine("#define _EVENT_ssize_t SSIZE_T"); // signed size_t
-                    }
+                    return "#define _EVENT_SIZEOF_SIZE_T 8"; // assume 64-bit
                 }
             }
-            Log.Info("Writing libevent configuration header : {0}", destPath);
-        }
-
-        protected override void
-        GetExecutionPolicy(
-            string mode)
-        {
-            // TODO: do nothing
         }
     }
 }
